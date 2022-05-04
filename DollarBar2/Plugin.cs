@@ -13,9 +13,21 @@ namespace DollarBar2
 	[CustomResolutionPluginAttribute(RuleOHLC=true)]
 	public class Plugin : ICustomResolutionPlugin, ICustomPluginFormatParams, ICustomResolutionStyles
 	{
+		#region Declare Variable
+		ICustomBar Bar;
+
+		#endregion
+
+
 		#region Ctor
 		public Plugin()
 		{
+			int a = 10;
+			int b = 15;
+			
+			
+			
+
 			Trace.Write("Hello World");
 
 		}
