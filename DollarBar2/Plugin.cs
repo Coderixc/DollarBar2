@@ -4,6 +4,8 @@ using System.Runtime.InteropServices;
 using CustomResolutionsTypes;
 using System.Linq;
 using System.Diagnostics;
+using System.Windows.Forms;
+using System.IO;
 
 namespace DollarBar2
 {
@@ -24,9 +26,9 @@ namespace DollarBar2
 		{
 			int a = 10;
 			int b = 15;
-			
-			
-			
+
+
+			MessageBox.Show("Construtor Called");
 
 			Trace.Write("Hello World");
 
@@ -76,6 +78,8 @@ namespace DollarBar2
 
 		public void Init(IBaseOptions baseOptions, IParams customParams)
 		{
+
+			MessageBox.Show("INIT");
 			if (baseOptions != null)
 			{
 				m_PointValue = baseOptions.PointValue;
@@ -88,18 +92,41 @@ namespace DollarBar2
 
 		public void OnData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
 		{
-			m_Volume	+= volumeAdded;
-			m_UpVolume	+= upVolumeAdded;
-			m_DownVolume	+= downVolumeAdded;
 
+			//MessageBox.Show("ONDATA");
+
+
+
+			m_Volume += volumeAdded;
+			m_UpVolume += upVolumeAdded;
+			m_DownVolume += downVolumeAdded;
 			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+
 			if (isBarClose)
 			{
-				Bar.CloseBar();
-				m_Volume = 0;
-				m_UpVolume = 0;
-				m_DownVolume = 0;
+				if (m_UpVolume >= 100000)
+				{
+					Bar.CloseBar();
+					m_Volume = 0;
+					m_UpVolume = 0;
+					m_DownVolume = 0;
+
+				}
+
 			}
+
+			//m_Volume	+= volumeAdded;
+			//m_UpVolume	+= upVolumeAdded;
+			//m_DownVolume	+= downVolumeAdded;
+
+			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+			//if (isBarClose)
+			//{
+			//	Bar.CloseBar();
+			//	m_Volume = 0;
+			//	m_UpVolume = 0;
+			//	m_DownVolume = 0;
+			//}
 		}
 
 		public void Reset()
@@ -133,5 +160,80 @@ namespace DollarBar2
 		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.OHLC };
 		#endregion
 	}
+
+
+
+
+	class FilePrint
+    {
+		string path = @".//Output";
+		string Datapath = @".//Output//BTCUSD.csv";
+
+		private bool Sinleuse = true;
+
+
+		public FilePrint()
+        {
+			if(!Directory.Exists(path))
+            {
+
+				Directory.CreateDirectory(path);	
+            }
+
+			if(File.Exists(Datapath))
+            {
+				File.Delete(Datapath);
+
+				File.Create(Datapath);
+
+            }
+
+			//create coloumn
+
+			if(Sinleuse)
+            {
+				string header =
+						 "Bar" + ","
+						+ "time_in_ticks " + ","
+						+ "tickId " + ","
+						+ "open " + ","
+						+ "high " + ","
+						+ "low " + ","
+						+ "close " + ","
+						+ "volumeAdded " + ","
+						+ "upVolumeAdded " + ","
+						+ "downVolumeAdded " + ","
+						+ "trend " + ","
+						+ "isBarClose";
+
+				File.WriteAllText(Datapath, header);
+				Sinleuse = false;
+
+			}
+
+		}
+
+
+		public void OnDataReceiveData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
+        {
+			String data = Bar + ","
+						+ time_in_ticks + ","
+						+ tickId + ","
+						+ open + ","
+						+ high + ","
+						+ low + ","
+						+ close + ","
+						+ volumeAdded + ","
+						+ upVolumeAdded + ","
+						+ downVolumeAdded + ","
+						+ trend + ","
+						+ isBarClose;
+
+			File.WriteAllText(Datapath, data);
+
+		}
+
+    }
+
 }
 
