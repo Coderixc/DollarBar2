@@ -17,6 +17,7 @@ namespace DollarBar2
 	{
 		#region Declare Variable
 		ICustomBar Bar;
+		FilePrint ExportData;
 
 		#endregion
 
@@ -28,7 +29,17 @@ namespace DollarBar2
 			int b = 15;
 
 
-			MessageBox.Show("Construtor Called");
+			try
+			{
+				this.ExportData = new FilePrint();
+			}
+			catch
+			{ 
+			
+			}
+
+
+			//MessageBox.Show("Construtor Called");
 
 			Trace.Write("Hello World");
 
@@ -79,7 +90,7 @@ namespace DollarBar2
 		public void Init(IBaseOptions baseOptions, IParams customParams)
 		{
 
-			MessageBox.Show("INIT");
+			//MessageBox.Show("INIT");
 			if (baseOptions != null)
 			{
 				m_PointValue = baseOptions.PointValue;
@@ -94,6 +105,20 @@ namespace DollarBar2
 		{
 
 			//MessageBox.Show("ONDATA");
+			this.ExportData.OnDataReceiveData(Bar, time_in_ticks, tickId, open, high, low, close, volumeAdded, upVolumeAdded, downVolumeAdded, trend, isBarClose);
+
+			//MessageBox.Show(Bar + ","
+			//			+ time_in_ticks + ","
+			//			+ tickId + ","
+			//			+ open + ","
+			//			+ high + ","
+			//			+ low + ","
+			//			+ close + ","
+			//			+ volumeAdded + ","
+			//			+ upVolumeAdded + ","
+			//			+ downVolumeAdded + ","
+			//			+ trend + ","
+			//			+ isBarClose);
 
 
 
@@ -166,31 +191,54 @@ namespace DollarBar2
 
 	class FilePrint
     {
-		string path = @".//Output";
-		string Datapath = @".//Output//BTCUSD.csv";
+
+		static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
+		string path = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT";
+		string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
 
 		private bool Sinleuse = true;
 
 
+		//public const string OHLC_CSVpath = @".\\1INCHUSD.csv";
+		//public const string BTCUSD_CSVpath = @".\\BTCUSD.txt";
+
 		public FilePrint()
         {
-			if(!Directory.Exists(path))
+            if (!Directory.Exists(path))
             {
 
-				Directory.CreateDirectory(path);	
-            }
+                Directory.CreateDirectory(path);
 
-			if(File.Exists(Datapath))
+
+            }
+            try
             {
-				File.Delete(Datapath);
 
-				File.Create(Datapath);
+                if (File.Exists(Datapath))
+                {
+                    File.Delete(Datapath);
+
+                    //File.SetAttributes(Datapath, FileAttributes.Normal);
+                    //File.Delete(Datapath);
+
+                }
+               // File.Create(Datapath);
+
+				var myFile = File.Create(Datapath);
+				//myPath = "C:\file.txt"
+				myFile.Close();
+
+				//File.Copy(file, dest, true);
+				//File.SetAttributes(dest, FileAttributes.Normal);
+			}
+            catch (Exception ex)
+            {
 
             }
 
-			//create coloumn
+            //create coloumn
 
-			if(Sinleuse)
+            if (Sinleuse)
             {
 				string header =
 						 "Bar" + ","
