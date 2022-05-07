@@ -19,6 +19,10 @@ namespace DollarBar2
 		ICustomBar Bar;
 		FilePrint ExportData;
 
+		private int PreviousDate = 0; //Past
+		private int ProcessDate = 0; //Presnt
+		private bool Flag_SameDate = true;
+
 		#endregion
 
 
@@ -106,6 +110,23 @@ namespace DollarBar2
 		{
 
 
+			string dt = DateTimeString(time_in_ticks);
+			if(Flag_SameDate)
+            {
+				this.PreviousDate =Convert.ToInt32( dt.Substring(0,8));
+				this.Flag_SameDate  = false;
+			}
+
+			this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
+
+			if(this.PreviousDate != this.ProcessDate)
+            {
+
+            }
+
+
+
+
 			String data = Bar + ","
 					+ time_in_ticks + ","
 					+ tickId + ","
@@ -128,21 +149,6 @@ namespace DollarBar2
 				MessageBox.Show(ex.Message);
 			}
 
-			//MessageBox.Show("ONDATA");
-		//this.ExportData.OnDataReceiveData(Bar, time_in_ticks, tickId, open, high, low, close, volumeAdded, upVolumeAdded, downVolumeAdded, trend, isBarClose);
-
-			//MessageBox.Show(Bar + ","
-			//			+ time_in_ticks + ","
-			//			+ tickId + ","
-			//			+ open + ","
-			//			+ high + ","
-			//			+ low + ","
-			//			+ close + ","
-			//			+ volumeAdded + ","
-			//			+ upVolumeAdded + ","
-			//			+ downVolumeAdded + ","
-			//			+ trend + ","
-			//			+ isBarClose);
 
 
 
@@ -207,13 +213,35 @@ namespace DollarBar2
 		}
 
 		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.OHLC };
-		#endregion
-	}
+        #endregion
+
+        #region Date EPOCH Time TO String
+		private string DateTimeString(long epochtime)
+        {
+			string result = String.Empty;
+			
+            try
+            {
+				String dt = new DateTime(epochtime).ToString("yyyyMMddHHmmss");
+				return  dt;	
+			}
+			catch (Exception ex)
+            {
+
+				return result;
+            }
+
+
+
+		}
+        #endregion
+
+    }
 
 
 
 
-	class FilePrint
+    class FilePrint
     {
 
 		static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
