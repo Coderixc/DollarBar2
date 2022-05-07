@@ -28,6 +28,7 @@ namespace DollarBar2
 			int a = 10;
 			int b = 15;
 
+			//IBaseOptions baseOptions  = new Base64FormattingOptions();
 
 			try
 			{
@@ -104,8 +105,31 @@ namespace DollarBar2
 		public void OnData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
 		{
 
+
+			String data = Bar + ","
+					+ time_in_ticks + ","
+					+ tickId + ","
+					+ open + ","
+					+ high + ","
+					+ low + ","
+					+ close + ","
+					+ volumeAdded + ","
+					+ upVolumeAdded + ","
+					+ downVolumeAdded + ","
+					+ trend + ","
+					+ isBarClose;
+
+			try
+			{
+				File.WriteAllText(this.ExportData.Datapath, data);
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+
 			//MessageBox.Show("ONDATA");
-			this.ExportData.OnDataReceiveData(Bar, time_in_ticks, tickId, open, high, low, close, volumeAdded, upVolumeAdded, downVolumeAdded, trend, isBarClose);
+		//this.ExportData.OnDataReceiveData(Bar, time_in_ticks, tickId, open, high, low, close, volumeAdded, upVolumeAdded, downVolumeAdded, trend, isBarClose);
 
 			//MessageBox.Show(Bar + ","
 			//			+ time_in_ticks + ","
@@ -194,7 +218,7 @@ namespace DollarBar2
 
 		static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
 		string path = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT";
-		string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
+		public string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
 
 		private bool Sinleuse = true;
 
@@ -277,7 +301,15 @@ namespace DollarBar2
 						+ trend + ","
 						+ isBarClose;
 
-			File.WriteAllText(Datapath, data);
+            try
+            {
+				File.WriteAllText(Datapath, data);
+			}
+			catch (Exception ex)
+            {
+				MessageBox.Show(ex.Message);
+            }
+
 
 		}
 

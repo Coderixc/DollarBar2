@@ -1,7 +1,8 @@
-
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{7748BD66-02CA-408D-A20A-2E38CF11AA32}") = "DollarBar2", "DollarBar2\DollarBar2.csproj", "{9E90EDEF-DA3E-4C70-ABA1-BFA5D36EE12D}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DollarBar2", "DollarBar2\DollarBar2.csproj", "{9E90EDEF-DA3E-4C70-ABA1-BFA5D36EE12D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -22,5 +23,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C39ACE3E-1618-4CEE-8EA5-5541897ACFEA}
 	EndGlobalSection
 EndGlobal
