@@ -6,6 +6,9 @@ using System.Linq;
 using System.Diagnostics;
 using System.Windows.Forms;
 using System.IO;
+using System.Data;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace DollarBar2
 {
@@ -18,6 +21,36 @@ namespace DollarBar2
 		#region Declare Variable
 		ICustomBar Bar;
 		FilePrint ExportData;
+
+
+		private DataTable dtDebug; //STORING ALL COMPUTATIONAL DATA
+
+		private long LastbardateTimeEnter = 0;
+		private bool flag_bardateChanges = true; //Flag -- > used to store the  current last bardate time
+
+		private bool flag_TickblazeOutputwindow = false;
+		private bool flag_Ignorefirstbar = true;
+
+		private DataTable DT_barSizevarWithDAY; //_barSizeVar rows have a timestamp on when the DAY
+
+		private Indiactaor LibIndicator;
+
+
+		private List<double> ListPrice_minutes = new List<double>();
+		private List<double> ListVolume_minutes = new List<double>();
+
+		private List<double> ListPrice_mean = new List<double>();
+		private List<double> ListVolume_sum = new List<double>();
+
+		private Queue<double> QueuePrice_mean = new Queue<double>();
+		private Queue<double> QueueVolume_sum = new Queue<double>();
+
+		private List<double> list_barsizevar = new List<double>();
+
+		private bool Processingfurther = false;
+
+		private double _barSize = 0;
+		private double _barSizeVar = 0;	
 
 		private int PreviousDate = 0; //Past
 		private int ProcessDate = 0; //Presnt
@@ -110,6 +143,9 @@ namespace DollarBar2
 		{
 
 
+			this.ListPrice_minutes.Add(close);
+			this.ListVolume_minutes.Add(volumeAdded);
+
 			string dt = DateTimeString(time_in_ticks);
 			if(Flag_SameDate)
             {
@@ -119,35 +155,55 @@ namespace DollarBar2
 
 			this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
 
-			if(this.PreviousDate != this.ProcessDate)
+			#region Resampling data for a Day in Multicharts
+			if (this.PreviousDate != this.ProcessDate)
             {
 
-            }
+				//Creating List1 which holds the closing prices.mean()
+				double res = this.resample_WithMean(this.ListPrice_minutes);
+				//this.ListPrice_mean.Add(res);
+				this.QueuePrice_mean.Enqueue(res);
 
+				//Creating List2 which holds the volumes.sum()
+				double vol = this.resample_WithoutMean(this.ListVolume_minutes);
+				//this.ListVolume_sum.Add(vol);
+				this.QueueVolume_sum.Enqueue(vol);
 
+				//this.minute_dollarvalue.Clear(); // Clear List when Resmapling is Done for a day
+				this.ListPrice_minutes.Clear();
+				this.ListVolume_minutes.Clear();
 
+				this.PreviousDate = Convert.ToInt32(dt.Substring(0, 8));
 
-			String data = Bar + ","
-					+ time_in_ticks + ","
-					+ tickId + ","
-					+ open + ","
-					+ high + ","
-					+ low + ","
-					+ close + ","
-					+ volumeAdded + ","
-					+ upVolumeAdded + ","
-					+ downVolumeAdded + ","
-					+ trend + ","
-					+ isBarClose;
-
-			try
-			{
-				File.WriteAllText(this.ExportData.Datapath, data);
 			}
-			catch (Exception ex)
+			#endregion
+
+
+
+
+			int Threshold = Math.Max(this.QueuePrice_mean.Count, this.QueueVolume_sum.Count);
+			if (Threshold >= 30)
 			{
-				MessageBox.Show(ex.Message);
+
+
+				this.list_barsizevar = this.LibIndicator.Multiply(this.QueuePrice_mean.ToList(), this.QueueVolume_sum.ToList());
+
+				// Remove first elements
+				this.QueuePrice_mean.Dequeue();
+				this.QueueVolume_sum.Dequeue();
+
+				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
+
+				_barSize = _barSizeVar;
+
+
 			}
+			else
+			{
+				this._barSize = 100000; //By Default : TODO Link with variable similar to Tick Blaze
+			}
+
+
 
 
 
@@ -234,114 +290,296 @@ namespace DollarBar2
 
 
 		}
-        #endregion
+		#endregion
 
-    }
-
-
-
-
-    class FilePrint
-    {
-
-		static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
-		string path = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT";
-		public string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
-
-		private bool Sinleuse = true;
-
-
-		//public const string OHLC_CSVpath = @".\\1INCHUSD.csv";
-		//public const string BTCUSD_CSVpath = @".\\BTCUSD.txt";
-
-		public FilePrint()
-        {
-            if (!Directory.Exists(path))
-            {
-
-                Directory.CreateDirectory(path);
-
-
-            }
-            try
-            {
-
-                if (File.Exists(Datapath))
-                {
-                    File.Delete(Datapath);
-
-                    //File.SetAttributes(Datapath, FileAttributes.Normal);
-                    //File.Delete(Datapath);
-
-                }
-               // File.Create(Datapath);
-
-				var myFile = File.Create(Datapath);
-				//myPath = "C:\file.txt"
-				myFile.Close();
-
-				//File.Copy(file, dest, true);
-				//File.SetAttributes(dest, FileAttributes.Normal);
+		#region Calculating Mean
+		private double mean(double totalsum, int noofsample)
+		{
+			if (flag_TickblazeOutputwindow)
+			{
+				MessageBox.Show("Entered into mean(Sum) Method");
 			}
-            catch (Exception ex)
-            {
+			double result = 0.0;
+			if (noofsample <= 0)
+				return -1.0;
+			try
+			{
+				result = totalsum / noofsample;
+				return result;
 
-            }
-
-            //create coloumn
-
-            if (Sinleuse)
-            {
-				string header =
-						 "Bar" + ","
-						+ "time_in_ticks " + ","
-						+ "tickId " + ","
-						+ "open " + ","
-						+ "high " + ","
-						+ "low " + ","
-						+ "close " + ","
-						+ "volumeAdded " + ","
-						+ "upVolumeAdded " + ","
-						+ "downVolumeAdded " + ","
-						+ "trend " + ","
-						+ "isBarClose";
-
-				File.WriteAllText(Datapath, header);
-				Sinleuse = false;
-
-			}
-
-		}
-
-
-		public void OnDataReceiveData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
-        {
-			String data = Bar + ","
-						+ time_in_ticks + ","
-						+ tickId + ","
-						+ open + ","
-						+ high + ","
-						+ low + ","
-						+ close + ","
-						+ volumeAdded + ","
-						+ upVolumeAdded + ","
-						+ downVolumeAdded + ","
-						+ trend + ","
-						+ isBarClose;
-
-            try
-            {
-				File.WriteAllText(Datapath, data);
 			}
 			catch (Exception ex)
-            {
-				MessageBox.Show(ex.Message);
-            }
-
-
+			{
+				MessageBox.Show("Unhandled Exception in ExtractDateonly " + ex.ToString());
+				result = 0.0;
+				return result;
+			}
 		}
+		#endregion
 
-    }
+		#region Applying Resample
+		private double resample_WithMean(List<double> List_Input, int freq = 1)
+		{
+			if (flag_TickblazeOutputwindow)
+			{
+				MessageBox.Show("Entered into Resampling  With Mean Method");
+			}
+			double sum = 0.0;
+			double result = 0.0;
+			int i = 0;
+			try
+			{
+				for (i = 0; i < List_Input.Count; i++)
+				{
+					sum = sum + List_Input[i];
+
+				}
+				result = mean(sum, List_Input.Count);
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				return 0.0;
+			}
+		}
+		#endregion
+
+		#region Resampling Without Mean
+		private double resample_WithoutMean(List<double> List_Input, int freq = 1)
+		{
+			if (flag_TickblazeOutputwindow)
+			{
+				MessageBox.Show("Entered into Resampling  Without Mean Method");
+			}
+			double sum = 0.0;
+			double result = 0.0;
+			int i = 0;
+			try
+			{
+				for (i = 0; i < List_Input.Count; i++)
+				{
+					result = result + List_Input[i];
+
+				}
+				;
+				return result;
+			}
+			catch (Exception ex)
+			{
+				Console.WriteLine(ex.ToString());
+				return 0.0;
+			}
+		}
+		#endregion
+
+
+
+		#region  Indicator Function
+		class Indiactaor 
+		{
+			private List<double> LitsResult;
+
+			public Indiactaor()
+			{
+
+				this.LitsResult = new List<double>();
+			}
+
+
+			#region Simple Moving average
+			public double Simple_MovingAverage(List<double> listBar, int barback)
+			{
+				if (barback == 0)
+					return 0; //Can't divide by 0
+
+				double result = 0.0;
+				int loopend = listBar.Count - barback;
+				int idx = 0;
+				string element = "";
+				try
+				{
+					if (loopend < 0)
+					{
+						//return  TODO : Pending 
+					}
+
+					for (idx = listBar.Count - 1; idx > loopend - 1; idx--)
+					{
+						result += listBar[idx];
+						element = element + listBar[idx] + ",";
+					}
+				}
+				catch (Exception e)
+				{
+					MessageBox.Show(" Erorr(s) Ocuured in " + MethodInfo.GetCurrentMethod().Name + $"{e.Message }");
+
+				}
+
+				return (double)result / barback;
+			}
+			#endregion
+
+			#region Multiply Two list
+			public List<double> Multiply(List<double> list1, List<double> list2)
+			{
+				try
+				{
+					this.LitsResult.Clear();
+					int Max = Math.Max(list1.Count, list2.Count);
+
+					for (int i = 0; i < Max; i++)
+					{
+						try
+						{
+
+							double result = 0;
+
+							if (list1.ElementAtOrDefault(i) == 0.0)
+							{
+								list1.Add(0.0);
+							}
+							if (list2.ElementAtOrDefault(i) == 0.0)
+							{
+								list2.Add(0.0);
+							}
+
+							result = list1.ElementAt(i) * list2.ElementAt(2);
+
+							this.LitsResult.Add(result);
+
+
+						}
+						catch (Exception e)
+						{
+
+						}
+					}
+
+					return this.LitsResult;
+
+				}
+				catch (Exception ex)
+				{
+					string err = $"Error(s) Occured in {MethodInfo.GetCurrentMethod().Name} error message {ex.Message}  ";
+					return this.LitsResult;
+				}
+
+
+			}
+
+			#endregion
+		}
+		#endregion
+
+
+
+	}
+
+
+
+
+	//class FilePrint
+ //   {
+
+	//	static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
+	//	string path = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT";
+	//	public string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
+
+	//	private bool Sinleuse = true;
+
+
+	//	//public const string OHLC_CSVpath = @".\\1INCHUSD.csv";
+	//	//public const string BTCUSD_CSVpath = @".\\BTCUSD.txt";
+
+	//	public FilePrint()
+ //       {
+ //           if (!Directory.Exists(path))
+ //           {
+
+ //               Directory.CreateDirectory(path);
+
+
+ //           }
+ //           try
+ //           {
+
+ //               if (File.Exists(Datapath))
+ //               {
+ //                   File.Delete(Datapath);
+
+ //                   //File.SetAttributes(Datapath, FileAttributes.Normal);
+ //                   //File.Delete(Datapath);
+
+ //               }
+ //              // File.Create(Datapath);
+
+	//			var myFile = File.Create(Datapath);
+	//			//myPath = "C:\file.txt"
+	//			myFile.Close();
+
+	//			//File.Copy(file, dest, true);
+	//			//File.SetAttributes(dest, FileAttributes.Normal);
+	//		}
+ //           catch (Exception ex)
+ //           {
+
+ //           }
+
+ //           //create coloumn
+
+ //           if (Sinleuse)
+ //           {
+	//			string header =
+	//					 "Bar" + ","
+	//					+ "time_in_ticks " + ","
+	//					+ "tickId " + ","
+	//					+ "open " + ","
+	//					+ "high " + ","
+	//					+ "low " + ","
+	//					+ "close " + ","
+	//					+ "volumeAdded " + ","
+	//					+ "upVolumeAdded " + ","
+	//					+ "downVolumeAdded " + ","
+	//					+ "trend " + ","
+	//					+ "isBarClose";
+
+	//			File.WriteAllText(Datapath, header);
+	//			Sinleuse = false;
+
+	//		}
+
+	//	}
+
+
+	//	public void OnDataReceiveData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
+ //       {
+	//		String data = Bar + ","
+	//					+ time_in_ticks + ","
+	//					+ tickId + ","
+	//					+ open + ","
+	//					+ high + ","
+	//					+ low + ","
+	//					+ close + ","
+	//					+ volumeAdded + ","
+	//					+ upVolumeAdded + ","
+	//					+ downVolumeAdded + ","
+	//					+ trend + ","
+	//					+ isBarClose;
+
+ //           try
+ //           {
+	//			File.WriteAllText(Datapath, data);
+	//		}
+	//		catch (Exception ex)
+ //           {
+	//			MessageBox.Show(ex.Message);
+ //           }
+
+
+	//	}
+
+ //   }
 
 }
 
