@@ -37,15 +37,17 @@ namespace DollarBar2
 
 		private int PreviousDate = 0; //Past
 		private int ProcessDate = 0; //Presnt
-		private bool Flag_SameDate = true;
+		private bool Flag_SingleUse = true;
+		private double barSizeFix;
 
 		#endregion
 		#region Ctor
 		public Plugin()
 		{
-			QueuePrice_mean = new Queue<double>();
-			QueueVolume_sum = new Queue<double>();
+			this.QueuePrice_mean = new Queue<double>();
+			this.QueueVolume_sum = new Queue<double>();
 			this.LibIndicator = new Indiactaor();
+			this.barSizeFix = 1000000;  //TODO : Load Default bar size while Loading Format Instruments..
 		}
 		#endregion
 
@@ -108,10 +110,10 @@ namespace DollarBar2
 			this.ListVolume_minutes.Add(volumeAdded);
 
 			string dt = DateTimeString(time_in_ticks);
-			if (Flag_SameDate)
+			if (this.Flag_SingleUse)
 			{
 				this.PreviousDate = Convert.ToInt32(dt.Substring(0, 8));
-				this.Flag_SameDate = false;
+				this.Flag_SingleUse = false;
 			}
 
 			this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
@@ -148,15 +150,15 @@ namespace DollarBar2
 				this.QueuePrice_mean.Dequeue();
 				this.QueueVolume_sum.Dequeue();
 
-				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
+				this._barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
 
-				_barSize = _barSizeVar;
+				this._barSize = _barSizeVar;
 
 
 			}
 			else
 			{
-				this._barSize = 1000000; //By Default : TODO Link with variable similar to Tick Blaze
+				this._barSize = this.barSizeFix; //By Default : TODO Link with variable similar to Tick Blaze
 			}
 
 			//m_Volume += volumeAdded;
