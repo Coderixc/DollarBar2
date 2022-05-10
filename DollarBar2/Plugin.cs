@@ -15,12 +15,12 @@ namespace DollarBar2
 	[ComVisible(true)]
 	[Guid("ba0b2a99-9014-4057-9973-66b2ea0ff4b3")]
 	[ClassInterface(ClassInterfaceType.None)]
-	[CustomResolutionPluginAttribute(RuleOHLC=true)]
+	[CustomResolutionPluginAttribute(RuleOHLC = true)]
 	public class Plugin : ICustomResolutionPlugin, ICustomPluginFormatParams, ICustomResolutionStyles
 	{
 		#region Declare Variable
 		ICustomBar Bar;
-		FilePrint ExportData;
+		//FilePrint ExportData;
 
 
 		private DataTable dtDebug; //STORING ALL COMPUTATIONAL DATA
@@ -42,15 +42,13 @@ namespace DollarBar2
 		private List<double> ListPrice_mean = new List<double>();
 		private List<double> ListVolume_sum = new List<double>();
 
-		private Queue<double> QueuePrice_mean = new Queue<double>();
-		private Queue<double> QueueVolume_sum = new Queue<double>();
-
+		private Queue<double> QueuePrice_mean;
+		private Queue<double> QueueVolume_sum;
 		private List<double> list_barsizevar = new List<double>();
 
-		private bool Processingfurther = false;
 
 		private double _barSize = 0;
-		private double _barSizeVar = 0;	
+		private double _barSizeVar = 0;
 
 		private int PreviousDate = 0; //Past
 		private int ProcessDate = 0; //Presnt
@@ -62,25 +60,9 @@ namespace DollarBar2
 		#region Ctor
 		public Plugin()
 		{
-			int a = 10;
-			int b = 15;
-
-			//IBaseOptions baseOptions  = new Base64FormattingOptions();
-
-			try
-			{
-				this.ExportData = new FilePrint();
-			}
-			catch
-			{ 
-			
-			}
-
-
-			//MessageBox.Show("Construtor Called");
-
-			Trace.Write("Hello World");
-
+			QueuePrice_mean = new Queue<double>();
+			QueueVolume_sum = new Queue<double>();
+			this.LibIndicator = new Indiactaor();
 		}
 		#endregion
 
@@ -121,7 +103,7 @@ namespace DollarBar2
 		private long m_Volume = 0;
 		private long m_UpVolume = 0;
 		private long m_DownVolume = 0;
-		private double	m_PointValue = 0.0001;
+		private double m_PointValue = 0.0001;
 		private long m_MinMovement = 1;
 		#endregion
 
@@ -147,17 +129,17 @@ namespace DollarBar2
 			this.ListVolume_minutes.Add(volumeAdded);
 
 			string dt = DateTimeString(time_in_ticks);
-			if(Flag_SameDate)
-            {
-				this.PreviousDate =Convert.ToInt32( dt.Substring(0,8));
-				this.Flag_SameDate  = false;
+			if (Flag_SameDate)
+			{
+				this.PreviousDate = Convert.ToInt32(dt.Substring(0, 8));
+				this.Flag_SameDate = false;
 			}
 
 			this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
 
 			#region Resampling data for a Day in Multicharts
 			if (this.PreviousDate != this.ProcessDate)
-            {
+			{
 
 				//Creating List1 which holds the closing prices.mean()
 				double res = this.resample_WithMean(this.ListPrice_minutes);
@@ -182,7 +164,7 @@ namespace DollarBar2
 
 
 			int Threshold = Math.Max(this.QueuePrice_mean.Count, this.QueueVolume_sum.Count);
-			if (Threshold >= 30)
+			if (Threshold >= 20)
 			{
 
 
@@ -192,7 +174,7 @@ namespace DollarBar2
 				this.QueuePrice_mean.Dequeue();
 				this.QueueVolume_sum.Dequeue();
 
-				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
+				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 20) / 50;
 
 				_barSize = _barSizeVar;
 
@@ -226,18 +208,6 @@ namespace DollarBar2
 
 			}
 
-			//m_Volume	+= volumeAdded;
-			//m_UpVolume	+= upVolumeAdded;
-			//m_DownVolume	+= downVolumeAdded;
-
-			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
-			//if (isBarClose)
-			//{
-			//	Bar.CloseBar();
-			//	m_Volume = 0;
-			//	m_UpVolume = 0;
-			//	m_DownVolume = 0;
-			//}
 		}
 
 		public void Reset()
@@ -250,9 +220,9 @@ namespace DollarBar2
 
 		#region ICustomPluginFormatParams
 		public void FormatParams(IParams customParams, IPriceScale priceScale, out string formattedParams)
-        {
-            formattedParams = Name;
-        }
+		{
+			formattedParams = Name;
+		}
 		#endregion
 
 		#region ICustomResolutionStyles
@@ -269,23 +239,23 @@ namespace DollarBar2
 		}
 
 		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.OHLC };
-        #endregion
+		#endregion
 
-        #region Date EPOCH Time TO String
+		#region Date EPOCH Time TO String
 		private string DateTimeString(long epochtime)
-        {
+		{
 			string result = String.Empty;
-			
-            try
-            {
+
+			try
+			{
 				String dt = new DateTime(epochtime).ToString("yyyyMMddHHmmss");
-				return  dt;	
+				return dt;
 			}
 			catch (Exception ex)
-            {
+			{
 
 				return result;
-            }
+			}
 
 
 
@@ -376,7 +346,7 @@ namespace DollarBar2
 
 
 		#region  Indicator Function
-		class Indiactaor 
+		class Indiactaor
 		{
 			private List<double> LitsResult;
 
@@ -478,108 +448,4 @@ namespace DollarBar2
 
 
 
-
-	//class FilePrint
- //   {
-
-	//	static string st = DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss").ToString();
-	//	string path = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT";
-	//	public string Datapath = @"C:\Users\kchan\OneDrive\Desktop\TSOUTPUT\BTCUSD_"+ st + ".csv";
-
-	//	private bool Sinleuse = true;
-
-
-	//	//public const string OHLC_CSVpath = @".\\1INCHUSD.csv";
-	//	//public const string BTCUSD_CSVpath = @".\\BTCUSD.txt";
-
-	//	public FilePrint()
- //       {
- //           if (!Directory.Exists(path))
- //           {
-
- //               Directory.CreateDirectory(path);
-
-
- //           }
- //           try
- //           {
-
- //               if (File.Exists(Datapath))
- //               {
- //                   File.Delete(Datapath);
-
- //                   //File.SetAttributes(Datapath, FileAttributes.Normal);
- //                   //File.Delete(Datapath);
-
- //               }
- //              // File.Create(Datapath);
-
-	//			var myFile = File.Create(Datapath);
-	//			//myPath = "C:\file.txt"
-	//			myFile.Close();
-
-	//			//File.Copy(file, dest, true);
-	//			//File.SetAttributes(dest, FileAttributes.Normal);
-	//		}
- //           catch (Exception ex)
- //           {
-
- //           }
-
- //           //create coloumn
-
- //           if (Sinleuse)
- //           {
-	//			string header =
-	//					 "Bar" + ","
-	//					+ "time_in_ticks " + ","
-	//					+ "tickId " + ","
-	//					+ "open " + ","
-	//					+ "high " + ","
-	//					+ "low " + ","
-	//					+ "close " + ","
-	//					+ "volumeAdded " + ","
-	//					+ "upVolumeAdded " + ","
-	//					+ "downVolumeAdded " + ","
-	//					+ "trend " + ","
-	//					+ "isBarClose";
-
-	//			File.WriteAllText(Datapath, header);
-	//			Sinleuse = false;
-
-	//		}
-
-	//	}
-
-
-	//	public void OnDataReceiveData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
- //       {
-	//		String data = Bar + ","
-	//					+ time_in_ticks + ","
-	//					+ tickId + ","
-	//					+ open + ","
-	//					+ high + ","
-	//					+ low + ","
-	//					+ close + ","
-	//					+ volumeAdded + ","
-	//					+ upVolumeAdded + ","
-	//					+ downVolumeAdded + ","
-	//					+ trend + ","
-	//					+ isBarClose;
-
- //           try
- //           {
-	//			File.WriteAllText(Datapath, data);
-	//		}
-	//		catch (Exception ex)
- //           {
-	//			MessageBox.Show(ex.Message);
- //           }
-
-
-	//	}
-
- //   }
-
 }
-
