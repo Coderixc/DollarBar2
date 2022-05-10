@@ -161,9 +161,9 @@ namespace DollarBar2
 				this._barSize = this.barSizeFix; //By Default : TODO Link with variable similar to Tick Blaze
 			}
 
-			//m_Volume += volumeAdded;
-			//m_UpVolume += upVolumeAdded;
-			//m_DownVolume += downVolumeAdded;
+			m_Volume += volumeAdded;
+			m_UpVolume += upVolumeAdded;
+			m_DownVolume += downVolumeAdded;
 			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
 			if (isBarClose)
