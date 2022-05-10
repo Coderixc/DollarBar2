@@ -19,28 +19,13 @@ namespace DollarBar2
 	public class Plugin : ICustomResolutionPlugin, ICustomPluginFormatParams, ICustomResolutionStyles
 	{
 		#region Declare Variable
-		ICustomBar Bar;
-		//FilePrint ExportData;
-
-
-		private DataTable dtDebug; //STORING ALL COMPUTATIONAL DATA
-
-		private long LastbardateTimeEnter = 0;
-		private bool flag_bardateChanges = true; //Flag -- > used to store the  current last bardate time
-
 		private bool flag_TickblazeOutputwindow = false;
-		private bool flag_Ignorefirstbar = true;
-
-		private DataTable DT_barSizevarWithDAY; //_barSizeVar rows have a timestamp on when the DAY
 
 		private Indiactaor LibIndicator;
 
 
 		private List<double> ListPrice_minutes = new List<double>();
 		private List<double> ListVolume_minutes = new List<double>();
-
-		private List<double> ListPrice_mean = new List<double>();
-		private List<double> ListVolume_sum = new List<double>();
 
 		private Queue<double> QueuePrice_mean;
 		private Queue<double> QueueVolume_sum;
@@ -55,8 +40,6 @@ namespace DollarBar2
 		private bool Flag_SameDate = true;
 
 		#endregion
-
-
 		#region Ctor
 		public Plugin()
 		{
@@ -109,8 +92,6 @@ namespace DollarBar2
 
 		public void Init(IBaseOptions baseOptions, IParams customParams)
 		{
-
-			//MessageBox.Show("INIT");
 			if (baseOptions != null)
 			{
 				m_PointValue = baseOptions.PointValue;
@@ -123,8 +104,6 @@ namespace DollarBar2
 
 		public void OnData(ICustomBar Bar, Int64 time_in_ticks, Int32 tickId, double open, double high, double low, double close, long volumeAdded, long upVolumeAdded, long downVolumeAdded, ECustomBarTrendType trend, bool isBarClose)
 		{
-
-
 			this.ListPrice_minutes.Add(close);
 			this.ListVolume_minutes.Add(volumeAdded);
 
@@ -160,21 +139,16 @@ namespace DollarBar2
 			}
 			#endregion
 
-
-
-
 			int Threshold = Math.Max(this.QueuePrice_mean.Count, this.QueueVolume_sum.Count);
-			if (Threshold >= 20)
+			if (Threshold >= 30)
 			{
-
-
 				this.list_barsizevar = this.LibIndicator.Multiply(this.QueuePrice_mean.ToList(), this.QueueVolume_sum.ToList());
 
 				// Remove first elements
 				this.QueuePrice_mean.Dequeue();
 				this.QueueVolume_sum.Dequeue();
 
-				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 20) / 50;
+				_barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
 
 				_barSize = _barSizeVar;
 
@@ -182,18 +156,13 @@ namespace DollarBar2
 			}
 			else
 			{
-				this._barSize = 100000; //By Default : TODO Link with variable similar to Tick Blaze
+				this._barSize = 1000000; //By Default : TODO Link with variable similar to Tick Blaze
 			}
 
-
-
-
-
-
-			m_Volume += volumeAdded;
-			m_UpVolume += upVolumeAdded;
-			m_DownVolume += downVolumeAdded;
-			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+			//m_Volume += volumeAdded;
+			//m_UpVolume += upVolumeAdded;
+			//m_DownVolume += downVolumeAdded;
+			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
 			if (isBarClose)
 			{
@@ -205,9 +174,7 @@ namespace DollarBar2
 					m_DownVolume = 0;
 
 				}
-
 			}
-
 		}
 
 		public void Reset()
@@ -224,7 +191,6 @@ namespace DollarBar2
 			formattedParams = Name;
 		}
 		#endregion
-
 		#region ICustomResolutionStyles
 		public Int32 StyleCount
 		{
@@ -343,8 +309,6 @@ namespace DollarBar2
 		}
 		#endregion
 
-
-
 		#region  Indicator Function
 		class Indiactaor
 		{
@@ -441,11 +405,5 @@ namespace DollarBar2
 			#endregion
 		}
 		#endregion
-
-
-
 	}
-
-
-
 }
