@@ -164,7 +164,7 @@ namespace DollarBar2
 			m_Volume += volumeAdded;
 			m_UpVolume += upVolumeAdded;
 			m_DownVolume += downVolumeAdded;
-			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
 			if (isBarClose)
 			{
