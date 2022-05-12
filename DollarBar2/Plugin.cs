@@ -47,7 +47,7 @@ namespace DollarBar2
 			this.QueuePrice_mean = new Queue<double>();
 			this.QueueVolume_sum = new Queue<double>();
 			this.LibIndicator = new Indiactaor();
-			this.barSizeFix = 1000000;  //TODO : Load Default bar size while Loading Format Instruments..
+			this.barSizeFix = 100000;  //TODO : Load Default bar size while Loading Format Instruments..
 		}
 		#endregion
 
