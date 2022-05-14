@@ -153,8 +153,6 @@ namespace DollarBar2
 				this._barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
 
 				this._barSize = _barSizeVar;
-
-
 			}
 			else
 			{
