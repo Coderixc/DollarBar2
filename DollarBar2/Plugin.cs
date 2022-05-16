@@ -137,7 +137,6 @@ namespace DollarBar2
 				this.ListVolume_minutes.Clear();
 
 				this.PreviousDate = Convert.ToInt32(dt.Substring(0, 8));
-
 			}
 			#endregion
 
