@@ -166,13 +166,17 @@ namespace DollarBar2
 			m_Volume += volumeAdded;
 			m_UpVolume += upVolumeAdded;
 			m_DownVolume += downVolumeAdded;
-			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+
+			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
 			if (isBarClose)
 			{
-				if (m_UpVolume >= 100000)
+				if (m_UpVolume >= this._barSize)
 				{
-					Bar.CloseBar();
+
+					Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+
+					//Bar.CloseBar();
 					m_Volume = 0;
 					m_UpVolume = 0;
 					m_DownVolume = 0;
