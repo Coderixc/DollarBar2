@@ -49,9 +49,9 @@ namespace DollarBar2
 			this.LibIndicator = new Indiactaor();
 
 			//*** For now we have changed this to a default value of 5 Billion. If you Open BTCUSD with Bitfinex Data or XBTUSD - the data we send u in the email, you can see that bar is being sampled every time volume crosses 5,000,000,000
-			this.barSizeFix = 5000000000;  //TODO : Load Default bar size while Loading Format Instruments..
-		
-		
+			this.barSizeFix = 5000000000;//5000000000;  //TODO : Load Default bar size while Loading Format Instruments..
+
+
 		}
 		#endregion
 
@@ -254,7 +254,7 @@ namespace DollarBar2
 			return m_Styles[Idx];
 		}
 
-		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.OHLC };
+		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.Candlestick };
 		#endregion
 
 		#region Date EPOCH Time TO String
