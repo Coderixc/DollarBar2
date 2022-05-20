@@ -113,6 +113,14 @@ namespace DollarBar2
 			this.ListPrice_minutes.Add(close);
 			this.ListVolume_minutes.Add(volumeAdded);
 
+			//*** Have you checked the format of time_in_ticks ?
+			//635726880600000000-- > 20150717000100
+			//635726880600000000-- > 20150717000100
+			//635726881200000000---> 20150717000200
+			//635726881800000000---> 20150717000300
+
+
+
 			string dt = DateTimeString(time_in_ticks);
 			if (this.Flag_SingleUse)
 			{
@@ -171,7 +179,9 @@ namespace DollarBar2
 
 			if (isBarClose)
 			{
-				if (m_UpVolume >= this._barSize)
+
+				//if (m_UpVolume >= this._barSize)
+				if (m_Volume >= this._barSize)
 				{
 
 					Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
