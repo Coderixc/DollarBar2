@@ -177,6 +177,38 @@ namespace DollarBar2
 					m_UpVolume = 0;
 					m_DownVolume = 0;
 
+
+					//logic similar to TB simulation
+					//BarBuilderSetIsMissing(bool)
+					Bar.CloseBar();
+
+					// Set the start Datetime
+					//BarBuilderSetStartDateTime(starttime);
+					//Format of UPDATEBar is Different  from Tick blazw, no need  update Starttime function
+					//as  have used logic similar to above 
+					//this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
+
+					// Set the end Datetime
+					//endtime = endDateTime;
+					//BarBuilderSetEndDateTime(endtime);
+
+
+
+					// Set the Close
+					//BarBuilderSetClose(close);
+
+					//Set the High 
+					//BarBuilderSetHigh(highest_high);
+
+					// Set the Low
+					//BarBuilderSetLow(lowest_low);
+
+					// Set the Open
+					//open_of_first_bar_ = Convert.ToDouble(open_of_first_bar);
+					//BarBuilderSetOpen(open_of_first_bar_);
+
+
+
 				}
 			}
 		}
