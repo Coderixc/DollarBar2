@@ -47,7 +47,11 @@ namespace DollarBar2
 			this.QueuePrice_mean = new Queue<double>();
 			this.QueueVolume_sum = new Queue<double>();
 			this.LibIndicator = new Indiactaor();
-			this.barSizeFix = 100000;  //TODO : Load Default bar size while Loading Format Instruments..
+
+			//*** For now we have changed this to a default value of 5 Billion. If you Open BTCUSD with Bitfinex Data or XBTUSD - the data we send u in the email, you can see that bar is being sampled every time volume crosses 5,000,000,000
+			this.barSizeFix = 5000000000;  //TODO : Load Default bar size while Loading Format Instruments..
+		
+		
 		}
 		#endregion
 
@@ -152,7 +156,7 @@ namespace DollarBar2
 				this._barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
 
 				this._barSize = _barSizeVar;
-				_barSizeVar = 5000000000;
+
 			}
 			else
 			{
