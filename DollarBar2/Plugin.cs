@@ -49,7 +49,7 @@ namespace DollarBar2
 			this.LibIndicator = new Indiactaor();
 
 			//*** For now we have changed this to a default value of 5 Billion. If you Open BTCUSD with Bitfinex Data or XBTUSD - the data we send u in the email, you can see that bar is being sampled every time volume crosses 5,000,000,000
-			this.barSizeFix = 50000000;//5000000000;  //TODO : Load Default bar size while Loading Format Instruments..
+			this.barSizeFix = 5000000;//5000000000;  //TODO : Load Default bar size while Loading Format Instruments..
 
 
 		}
@@ -177,55 +177,70 @@ namespace DollarBar2
 
 			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
+			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+
 			if (isBarClose)
 			{
-
-				//if (m_UpVolume >= this._barSize)
 				if (m_UpVolume >= this._barSize)
 				{
-
-					Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
-
-					//Bar.CloseBar();
+					Bar.CloseBar();
 					m_Volume = 0;
 					m_UpVolume = 0;
 					m_DownVolume = 0;
 
-
-					//logic similar to TB simulation
-					//BarBuilderSetIsMissing(bool)
-					//Bar.CloseBar();
-
-					// Set the start Datetime
-					//BarBuilderSetStartDateTime(starttime);
-					//Format of UPDATEBar is Different  from Tick blazw, no need  update Starttime function
-					//as  have used logic similar to above 
-					//this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
-
-					// Set the end Datetime
-					//endtime = endDateTime;
-					//BarBuilderSetEndDateTime(endtime);
-
-
-
-					// Set the Close
-					//BarBuilderSetClose(close);
-
-					//Set the High 
-					//BarBuilderSetHigh(highest_high);
-
-					// Set the Low
-					//BarBuilderSetLow(lowest_low);
-
-					// Set the Open
-					//open_of_first_bar_ = Convert.ToDouble(open_of_first_bar);
-					//BarBuilderSetOpen(open_of_first_bar_);
-
-
-
 				}
-				Bar.CloseBar();
 			}
+
+
+			//if (isBarClose)
+			//{
+
+			//	//if (m_UpVolume >= this._barSize)
+			//	if (m_UpVolume >= this._barSize)
+			//	{
+
+			//		Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+
+			//		//Bar.CloseBar();
+			//		m_Volume = 0;
+			//		m_UpVolume = 0;
+			//		m_DownVolume = 0;
+
+
+			//		//logic similar to TB simulation
+			//		//BarBuilderSetIsMissing(bool)
+			//		//Bar.CloseBar();
+
+			//		// Set the start Datetime
+			//		//BarBuilderSetStartDateTime(starttime);
+			//		//Format of UPDATEBar is Different  from Tick blazw, no need  update Starttime function
+			//		//as  have used logic similar to above 
+			//		//this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
+
+			//		// Set the end Datetime
+			//		//endtime = endDateTime;
+			//		//BarBuilderSetEndDateTime(endtime);
+
+
+
+			//		// Set the Close
+			//		//BarBuilderSetClose(close);
+
+			//		//Set the High 
+			//		//BarBuilderSetHigh(highest_high);
+
+			//		// Set the Low
+			//		//BarBuilderSetLow(lowest_low);
+
+			//		// Set the Open
+			//		//open_of_first_bar_ = Convert.ToDouble(open_of_first_bar);
+			//		//BarBuilderSetOpen(open_of_first_bar_);
+
+
+
+			//	}
+			//	Bar.CloseBar();
+			//}
 		}
 
 		public void Reset()
