@@ -194,7 +194,7 @@ namespace DollarBar2
 
 					//logic similar to TB simulation
 					//BarBuilderSetIsMissing(bool)
-					Bar.CloseBar();
+					//Bar.CloseBar();
 
 					// Set the start Datetime
 					//BarBuilderSetStartDateTime(starttime);
@@ -224,6 +224,7 @@ namespace DollarBar2
 
 
 				}
+				Bar.CloseBar();
 			}
 		}
 
