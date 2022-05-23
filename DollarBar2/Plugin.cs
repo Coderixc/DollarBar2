@@ -130,6 +130,7 @@ namespace DollarBar2
 
 			this.ProcessDate = Convert.ToInt32(dt.Substring(0, 8));
 
+
 			#region Resampling data for a Day in Multicharts
 			if (this.PreviousDate != this.ProcessDate)
 			{
@@ -174,8 +175,6 @@ namespace DollarBar2
 			m_Volume += volumeAdded;
 			m_UpVolume += upVolumeAdded;
 			m_DownVolume += downVolumeAdded;
-
-			//Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
 			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
 
