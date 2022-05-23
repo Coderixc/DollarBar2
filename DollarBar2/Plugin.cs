@@ -183,12 +183,13 @@ namespace DollarBar2
 				//if (m_UpVolume >= this._barSize)  //While Unclicking "Break On Session" on Format Instruments Console,    m_UpVolume is 0 ??
 				if (m_Volume >= this._barSize)
 				{
-					Bar.CloseBar();
+					//Bar.CloseBar();
 					m_Volume = 0;
 					m_UpVolume = 0;
 					m_DownVolume = 0;
 
 				}
+
 			}
 
 
