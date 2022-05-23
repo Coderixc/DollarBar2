@@ -176,11 +176,12 @@ namespace DollarBar2
 			m_UpVolume += upVolumeAdded;
 			m_DownVolume += downVolumeAdded;
 
-			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, false);
+			Bar.UpdateBar(time_in_ticks, tickId, open, high, low, close, m_Volume, m_UpVolume, m_DownVolume, trend, true, true);
 
 			if (isBarClose)
 			{
-				if (m_UpVolume >= this._barSize)
+				//if (m_UpVolume >= this._barSize)  //While Unclicking "Break On Session" on Format Instruments Console,    m_UpVolume is 0 ??
+				if (m_Volume >= this._barSize)
 				{
 					Bar.CloseBar();
 					m_Volume = 0;
