@@ -277,7 +277,7 @@ namespace DollarBar2
 			return m_Styles[Idx];
 		}
 
-		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.Candlestick,EStyleType.OHLC,EStyleType.HollowCandlestick};
+		private EStyleType[] m_Styles = new EStyleType[] { EStyleType.Candlestick,EStyleType.OHLC,EStyleType.HollowCandlestick,EStyleType.DotOnClose,EStyleType.HeikinAshi,EStyleType.Invisible};
 		#endregion
 
 		#region Date EPOCH Time TO String
@@ -479,4 +479,6 @@ namespace DollarBar2
 		}
 		#endregion
 	}
+
+	class
 }
