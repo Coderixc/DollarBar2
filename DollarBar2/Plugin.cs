@@ -154,7 +154,7 @@ namespace DollarBar2
 			#endregion
 
 			int Threshold = Math.Max(this.QueuePrice_mean.Count, this.QueueVolume_sum.Count);
-			if (Threshold >= 30)
+			if (Threshold >= 8)
 			{
 				this.list_barsizevar = this.LibIndicator.Multiply(this.QueuePrice_mean.ToList(), this.QueueVolume_sum.ToList());
 
@@ -162,7 +162,7 @@ namespace DollarBar2
 				this.QueuePrice_mean.Dequeue();
 				this.QueueVolume_sum.Dequeue();
 
-				this._barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 30) / 50;
+				this._barSizeVar = this.LibIndicator.Simple_MovingAverage(this.list_barsizevar, 8) / 50;
 
 				this._barSize = _barSizeVar;
 
@@ -249,6 +249,11 @@ namespace DollarBar2
 			m_Volume = 0;
 			m_UpVolume = 0;
 			m_DownVolume = 0;
+
+			this.QueueVolume_sum.Clear();
+			this.QueuePrice_mean.Clear();
+			this.ListPrice_minutes.Clear();
+			this.ListVolume_minutes.Clear();
 		}
 		#endregion
 
