@@ -480,5 +480,5 @@ namespace DollarBar2
 		#endregion
 	}
 
-	class
+	
 }
