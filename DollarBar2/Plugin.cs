@@ -253,8 +253,8 @@ namespace DollarBar2
 
 			this.QueueVolume_sum.Clear();
 			this.QueuePrice_mean.Clear();
-			this.ListPrice_minutes.Clear();
-			this.ListVolume_minutes.Clear();
+			//this.ListPrice_minutes.Clear();
+			//this.ListVolume_minutes.Clear();
 		}
 		#endregion
 
